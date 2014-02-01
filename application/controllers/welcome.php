@@ -2,34 +2,38 @@
 
 class Welcome extends CI_Controller {
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -  
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in 
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see http://codeigniter.com/user_guide/general/urls.html
-	 */
+	private $itemBaseUrl;
+	private $targetUrl;
+	private $tag;
+	
+	public function __construct(){
+		parent::__construct();
+	}
 	public function index()
 	{
 		//$this->load->view('welcome_message');
-		$this->load->helper('simple_html_dom');
 		//Target site url
-		$targetUrl='http://sh.ganji.com/iphone-iphone-5/o3/';
-		$itemBaseUrl='http://sh.ganji.com';
+		$this->itemBaseUrl='http://sh.ganji.com';
+		$this->tag="iphone4s";
+		for ($i=1;$i<=31;$i++){
+			$this->targetUrl="http://sh.ganji.com/iphone-iphone-4s/o$i/";
+			$isLoadedThisPage=self::catch_site($this->targetUrl, $this->itemBaseUrl);
+			if ($isLoadedThisPage) {
+				echo "<br/><font color='green'>$i page loaded ok</font><br/>";
+			}else {
+				echo "<br/><font color='red'>$i page loaded failed</font><br/>";
+			}
+		}
+		echo "<br/>finished!";
+	}
+	private function catch_site($targetUrl,$itemBaseUrl){
+		$this->load->helper('simple_html_dom');
 		
 		$html = file_get_html($targetUrl);
 		
 		header("Content-type:text/html;charset=utf-8;");
-
-	
+		
+		
 		$ret = $html->find('dl[class=list-bigpic]');
 		echo "<pre>";
 		foreach ($ret as $item){
@@ -37,21 +41,29 @@ class Welcome extends CI_Controller {
 			$title = $item->children(1)->children(0)->children(0)->children(0)->children(0)->plaintext;
 		
 			$link = $item->children(1)->children(0)->children(0)->children(0)->children(0);
-			$linkSite=$itemBaseUrl.$link->href;
+			$url=$itemBaseUrl.$link->href;
 		
 			$content = $item->children(1)->children(1)->plaintext;
-			//$date = $item->children(2)->children(2)->plaintext;
-			//$location = $item->children(2)->children(3)->children(0)->plaintext;
-			//$date=$item->find('i[class=mr8]')->outertext;
+		
 			$dates=$item->find('i[class=mr8]');
 			$date=$dates[0]->plaintext;
 		
 			$addses=$item->find('a[class=adds]');
 			$adds=$addses[0]->plaintext;
-		
-			echo "|$date |$adds|$yuan|$title |$linkSite |$content |<br/>";
+				
+			$this->load->model('grab_model');
+			$row_number=$this->grab_model->new_ganji ($yuan, $title, $content, $date, $adds, $url,$this->tag);
+			if (!$row_number) {
+				echo "||insert ganji table failed，row：$row_number||";
+			}
+			echo "$row_number|";
 		}
-		echo count($ret);
+		
+		if (count($ret)>0) {
+			return true;
+		}else {
+			return false;
+		}
 	}
 }
 
