@@ -20,7 +20,7 @@ class Grab_model extends CI_Model {
 	function new_ganji ($yuan=0, $title='', $content='', $date='', $adds='', $url='',$tag='') {
 	
 		$insert_fields = array(
-								'yuan' => intval($yuan),
+								'yuan' => floatval($yuan),
 								'title' => $title,
 								'content' => $content,
 								'date' => $date,
@@ -35,5 +35,12 @@ class Grab_model extends CI_Model {
 		$link_id = $this->db->insert_id();
 		
 		return $link_id;
+	}
+	function deleteRowWithTag($tag) {
+	
+		$this->db->where('tag', $tag);
+		$this->db->delete('ganji'); 
+		$affect_rows=$this->db->affected_rows();
+		return $affect_rows;
 	}
 }
