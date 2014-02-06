@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>show what you want!</title>
+</head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
+<style type='text/css'>
+html{
+	font-size:14px;
+	color:#000;
+	font-family:arial;
+	text-align:left;
+}
+table tr td a{
+	color:#000;
+	text-decoration:none;
+}
+table tr td a:hover{
+	color:#0064D3;
+}
+table tr td a:visited{
+	color:#777;
+}
+tr{
+	height:28px;
+}
+tr:hover{
+	background-color:#eee;
+}
+table{
+	border-collapse:collapse;
+}
+table tr td,table tr th{
+	padding:0 10px;
+}
+.isShow{
+	display:none;
+}
+
+</style>
+<body>
+<form action="<?php echo base_url('grab/index.php/welcome/show'); ?>" method="post" enctype="application/x-www-form-urlencoded">
+	<input type="text" name="sql" style="width:600px;" value="<?php echo $sql;?>" />
+	<input type="submit"/>
+</form>
+<br/>
+<table width="100%" border="1" cellpadding="0" cellspacing="0" bordercolor="#aaaaaa">
+  <tr>
+    <?php foreach ($rows[1] as $key=>$value):?>
+	<?php if($key=='comment'){?>
+		<th scope="col" width='160'><?php echo $key;?></th>
+	<?php }else if($key=='phone'){?>
+		<th scope="col" width='160'><?php echo $key;?></th>
+	<?php }else{?>
+		<th scope="col"><?php echo $key;?></th>
+	<?php }?>
+	<?php endforeach;?>
+  </tr>
+  <?php foreach ($rows as $row):?>
+  <tr>
+    
+    <?php foreach ($row as $key=>$value):?>
+    
+    <?php if($key=='url'){?>
+    
+    	<td><a href="<?php echo $value;?>" target="_blank"><?php echo $value;?></a></td>
+    <?php }else if($key=='title'){?>
+    	<td><a href="<?php echo $row['url'];?>" target="_blank"><?php echo $value;?></a></td>
+    <?php }else if($key=='comment'){?>
+    	<td class="isEditing">
+    		<?php echo $value;?>
+    		
+    		<div class="isShow">
+    		<form action="<?php echo base_url('grab/index.php/welcome/updateComment'); ?>" method="post" enctype="application/x-www-form-urlencoded">
+    			<input type="hidden" name="id" value="<?php echo $row['id'];?>" />
+				<input type="text" name="comment" style="width:100px;" value="" />
+				<input type="submit" value="提交"/>
+			</form>
+			</div>
+    	</td>
+    <?php }else if($key=='phone'){?>
+    	<td class="isEditing">
+    		<?php echo $value;?>
+    		<div class="isShow">
+    		<form action="<?php echo base_url('grab/index.php/welcome/updatePhone'); ?>" method="post" enctype="application/x-www-form-urlencoded">
+    			<input type="hidden" name="id" value="<?php echo $row['id'];?>" />
+				<input type="text" name="phone" style="width:100px;" value="" />
+				<input type="submit" value="提交"/>
+			</form>
+			</div>
+    	</td>
+    <?php }else{?>
+    
+    	<td><?php echo $value;?></td>
+    
+    <?php };?>
+
+
+	
+	<?php endforeach;?>
+  </tr>
+  <?php endforeach;?>
+</table>
+<script type="text/javascript">
+$(window).ready(function(){
+	$('.isEditing').click(function(){
+		$(this).children('.isShow').show();
+	})
+})
+</script>
+</body>
+</html>

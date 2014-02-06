@@ -1,0 +1,1 @@
+SELECT * FROM `ganji` where yuan>2000 and tag='ipad4' order by yuan asc

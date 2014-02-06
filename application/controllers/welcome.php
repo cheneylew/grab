@@ -12,6 +12,87 @@ class Welcome extends CI_Controller {
 	}
 	public function index()
 	{
+		$this->show();//begin show.
+	}
+	public function show(){
+		$sqlPost = $this->input->post('sql');
+		if (empty($sqlPost)) {
+			//$sqlpre = "SELECT * FROM `ganji` order by id asc";
+			$sqlpre=$this->readFromFile();
+		}else $sqlpre=$sqlPost;
+		
+		$sql=$sqlpre;//." limit 0,100";
+		
+		$this->writeToFile($sql);
+		
+		$this->load->model('grab_model');
+		$rowsArray=$this->grab_model->selectWithSQL($sql);
+		$data['rows']=$rowsArray;
+		$data['sql']=$sqlpre;
+		$this->load->view('show.html',$data);
+	}
+	private function writeToFile($sql){
+		$this->load->helper('file');
+		$data =$sql;
+		if (!write_file('./sqlTemp.php', $data))
+		{
+			//echo 'Unable to write the file';
+		}
+		else
+		{
+			//echo 'File written!';
+		}
+	}
+	private function readFromFile(){
+		$this->load->helper('file');
+		$string = read_file('./sqlTemp.php');
+		return $string;
+	}
+	public function updateComment(){
+		$id = $this->input->post('id');
+		$comment = $this->input->post('comment');
+		$sql = $this->readFromFile();
+	
+		$this->load->model('grab_model');
+		$affected_rows=$this->grab_model->updateWithIdAndComent($id,$comment);
+		
+		$sqlPost = $this->input->post('sql');
+		if (empty($sqlPost)) {
+			//$sqlpre = "SELECT * FROM `ganji` order by id asc";
+			$sqlpre=$this->readFromFile();
+		}else $sqlpre=$sqlPost;
+		
+		$sql=$sqlpre;//." limit 0,100";
+		
+		$this->load->model('grab_model');
+		$rowsArray=$this->grab_model->selectWithSQL($sql);
+		$data['rows']=$rowsArray;
+		$data['sql']=$sqlpre;
+		$this->load->view('show.html',$data);
+	}
+	public function updatePhone(){
+		$id = $this->input->post('id');
+		$phone = $this->input->post('phone');
+		$sql = $this->readFromFile();
+	
+		$this->load->model('grab_model');
+		$affected_rows=$this->grab_model->updateWithIdAndPhone($id,$phone);
+	
+		$sqlPost = $this->input->post('sql');
+		if (empty($sqlPost)) {
+			//$sqlpre = "SELECT * FROM `ganji` order by id asc";
+			$sqlpre=$this->readFromFile();
+		}else $sqlpre=$sqlPost;
+	
+		$sql=$sqlpre;//." limit 0,100";
+	
+		$this->load->model('grab_model');
+		$rowsArray=$this->grab_model->selectWithSQL($sql);
+		$data['rows']=$rowsArray;
+		$data['sql']=$sqlpre;
+		$this->load->view('show.html',$data);
+	}
+	public function grabIpad3(){
 		//Target site url
 		$this->itemBaseUrl='http://sh.ganji.com';
 		$this->tag="ipad3";
@@ -26,6 +107,28 @@ class Welcome extends CI_Controller {
 		for ($i=0;$i<=6;$i++){
 			$j=$i*32;
 			$this->targetUrl="http://sh.ganji.com/wu/b1/s/f$j/_ipad3/";
+			$this->loadAndCatchPage($j);
+			ob_flush();
+			flush();
+			//sleep(2);
+		}
+		echo "<br/>finished!";
+	}
+	public function grabIpad4(){
+		//Target site url
+		$this->itemBaseUrl='http://sh.ganji.com';
+		$this->tag="ipad4";
+	
+		header("Content-type:text/html;charset=utf-8;");
+		ob_end_flush();
+		ob_end_clean();
+		ob_implicit_flush();
+		echo str_repeat('#','1024').'<br />';
+		ob_flush();
+		flush();
+		for ($i=0;$i<=6;$i++){
+			$j=$i*32;
+			$this->targetUrl="http://sh.ganji.com/wu/b1/s/f$j/_ipad4/";
 			$this->loadAndCatchPage($j);
 			ob_flush();
 			flush();
